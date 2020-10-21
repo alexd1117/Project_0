@@ -26,12 +26,6 @@ object FileUtil {
 
   }
 
-  def writeTextContent(filename: String, content: String) = {
-
-
-
-  }
-
 
 
 }

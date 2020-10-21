@@ -1,5 +1,5 @@
 package movieHelperCLI
-//package
+
 
 object Main extends App {
 

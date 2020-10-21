@@ -1,4 +1,6 @@
 package movieHelperCLI
+import java.io.FileNotFoundException
+
 import org.mongodb.scala.MongoClient
 
 import scala.collection.mutable.ArrayBuffer
@@ -36,7 +38,8 @@ class movieHelperCLI {
   }
 
   def printOptions(): Unit = {
-    println("[csv filename]: ")
+    println("[Enter File ]: ")
+    println("delete : deletes info from database")
     println("exit : exits the application")
     println("Enter an Option from above: ")
 
@@ -50,18 +53,20 @@ class movieHelperCLI {
       var line = item.split(",").map(_.trim)
       csvData = csvData :+ line
     }
+
     println("Parse Done")
     println(csvData(0)(0))
   }
 
-  // we make getResults private, since it's not a functionality anyone should use
-  // ComicDao for.
   def getResults[T](obs: Observable[T]): Seq[T] = {
     Await.result(obs.toFuture(), Duration(10, SECONDS))
   }
 
   def printResults[T](obs: Observable[T]): Unit = {
     getResults(obs).foreach(println(_))
+  }
+  def dbEmpty(): Unit ={
+    printResults(collection.deleteMany(Filters.exists("delete")))
   }
 
 
@@ -86,32 +91,19 @@ class movieHelperCLI {
           continueMenuLoop = false
 
         }
-//          println(FileUtil,getTextContent(arg))
-
         case "file" => {
             println("Enter Filename")
             filename = StdIn.readLine()
-            //filename = "movieHelperCLI/Movie_Data.csv"
+
+            filename = s"movieHelperCLI/${filename}"
+
             parseCSV(filename)
             storeInDatabase()
         }
-//          continueMenuLoop = false
-        case "delete_all" => {
-          // deleteAllFromDatabase()
-        }
-
-        case "detete_specific" =>
-          val t = StdIn.readLine()
-//          deleteSpecfic(t)
 
         case notRecognized => println(s"$notRecognized not a recognized command")
-
-        //case // get Movie Title
-
-//        case get rating over 10
       }
     }
-
     println("Program Done")
   }
 
