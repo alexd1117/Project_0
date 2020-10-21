@@ -1,5 +1,4 @@
 package movieHelperCLI
-
 import org.mongodb.scala.MongoClient
 
 import scala.collection.mutable.ArrayBuffer
@@ -10,11 +9,11 @@ import org.mongodb.scala.{MongoClient, MongoCollection, Observable}
 
 import scala.concurrent.Await
 import scala.concurrent.duration.{Duration, SECONDS}
+import scala.io.StdIn
 //Make Sure to start with imports on our own projects
 import org.bson.codecs.configuration.CodecRegistries.{fromProviders, fromRegistries}
 import org.mongodb.scala.bson.codecs.Macros._
 import org.mongodb.scala.model.Filters._
-
 
 class movieHelperCLI {
 
@@ -31,6 +30,7 @@ class movieHelperCLI {
   //UpdateOptions object that has upsert set to true, for convenience
   val upsertTrue : UpdateOptions = (new UpdateOptions()).upsert(true)
 
+  //prints out your welcome statement
   def printWelcome() : Unit = {
     println("Welcome to the Movie Helper Cli CSV Parser!")
   }
@@ -51,7 +51,7 @@ class movieHelperCLI {
       csvData = csvData :+ line
     }
     println("Parse Done")
-    //println(csvData(0)(0))
+    println(csvData(0)(0))
   }
 
   // we make getResults private, since it's not a functionality anyone should use
@@ -72,8 +72,6 @@ class movieHelperCLI {
   }
 
 
-
-
   def runMovieHelper() : Unit = {
     printWelcome()
 
@@ -82,14 +80,30 @@ class movieHelperCLI {
     while(continueMenuLoop) {
       printOptions()
       //get some user input with StdIn.readLine
-      StdIn.readLine() match {
+      StdIn.readLine().toLowerCase() match {
 
-        case commandArgPattern(cmd, arg) if cmd.equalsIgnoreCase("exit") => continueMenuLoop = false
-          println(FileUtil,getTextContent(arg))
-
-        case commandArgPattern(cmd, arg) => println(s"Filename Enter: $arg")
-          filename = arg
+        case "exit" => {
           continueMenuLoop = false
+
+        }
+//          println(FileUtil,getTextContent(arg))
+
+        case "file" => {
+            println("Enter Filename")
+            filename = StdIn.readLine()
+            //filename = "movieHelperCLI/Movie_Data.csv"
+            parseCSV(filename)
+            storeInDatabase()
+        }
+//          continueMenuLoop = false
+        case "delete_all" => {
+          // deleteAllFromDatabase()
+        }
+
+        case "detete_specific" =>
+          val t = StdIn.readLine()
+//          deleteSpecfic(t)
+
         case notRecognized => println(s"$notRecognized not a recognized command")
 
         //case // get Movie Title
@@ -97,10 +111,8 @@ class movieHelperCLI {
 //        case get rating over 10
       }
     }
-    filename = "movieHelperCLI/Movie_Data.csv"
-    parseCSV(filename)
-    storeInDatabase()
 
+    println("Program Done")
   }
 
 
